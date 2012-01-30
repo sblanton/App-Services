@@ -38,7 +38,7 @@ has dbh => (
 sub dbh_builder {
  my $s = shift;
 
- my $dbh = DBI->connect($dsn,$_[0]->user,$_[0]->pwd);
+ my $dbh = DBI->connect($s->dsn,$s->user,$s->pwd);
 
  unless ( $dbh ) {
 	$s->log->error(DBI->errstr());

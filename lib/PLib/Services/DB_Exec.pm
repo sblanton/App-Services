@@ -35,20 +35,6 @@ has dbh => (
 	lazy => 1,
 );
 
-sub dbh_builder {
- my $s = shift;
-
- my $dbh = DBI->connect($dsn,$_[0]->user,$_[0]->pwd);
-
- unless ( $dbh ) {
-	$s->log->error(DBI->errstr());
-	return undef;
- }
-
- return $dbh;
-
-}
-
 sub exec {
 	my $s = shift or confess;
 
