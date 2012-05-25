@@ -4,21 +4,17 @@ use Moose;
 
 use Log::Log4perl;
 
-has log_category => (
- is => 'rw',
- default => '',
-);
- 
-has log => ( #-- The actual Log::Log4perl logger. Type?
-	is      => 'rw',
-	default => sub { $_[0]->log_category(ref($_[0])); $_[0]->get_logger() },
-);
-
-
-has log_conf_file => (
+has log_conf => (
  is => 'rw',
  isa => 'Str',
  default => "log4perl.conf",
+);
+
+has log_category => (
+ is => 'rw',
+ isa => 'Str',
+ default => sub { ref($_[0]) },
+ lazy => 1,
 );
 
 sub BUILD {
