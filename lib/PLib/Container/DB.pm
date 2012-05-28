@@ -5,6 +5,8 @@ use Bread::Board;
 
 extends 'Bread::Board::Container';
 
+use PLib::Container::Logger;
+
 sub BUILD {
 	$_[0]->build_container;
 }
@@ -12,7 +14,7 @@ sub BUILD {
 has dsn => (
 	is      => 'rw',
 	isa     => 'Str',
-	default => 'mydatabase',
+	default => 'dbi:SQLite:dbname=tmp.sqlite',
 );
 
 has db_user => (
@@ -27,7 +29,7 @@ has db_password => (
 	default => 'kong',
 );
 
-has log_conf_file => (
+has log_conf => (
 	is      => 'rw',
 	isa     => 'Str',
 	default => 'log4perl.conf',
@@ -44,27 +46,27 @@ sub build_container {
 	
 	my $util_cntnr = PLib::Container::Logger->new(
 		log_conf => $s->log_conf,
-		name => 'util'
+		name => 'log'
 	);
 
 
 	container $s => as {
 
-		service 'dsn'         => $s->host_name;
+		service 'dsn'         => $s->dsn;
 		service 'db_user'     => $s->db_user;
 		service 'db_password' => $s->db_password;
 
-		service 'db_conn' => (    #-- raw DBI database handle
+		service 'db_conn_svc' => (    #-- raw DBI database handle
 			class        => 'PLib::Services::DB_Conn',
 			dependencies => {
-				log_svc     => depends_on('util/log_svc'),
+				log_svc     => depends_on('log/log_svc'),
 				dsn         => 'dsn',
 				db_user     => 'db_user',
 				db_password => 'db_password',
 			}
 		);
 
-		service 'db_exec' => (
+		service 'db_exec_svc' => (
 			class        => 'PLib::Services::DB_Exec',
 			dependencies => {
 				log_svc => depends_on('util/log_svc'),

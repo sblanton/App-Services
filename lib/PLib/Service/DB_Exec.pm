@@ -10,25 +10,6 @@ has sql => (
 	is => 'rw',
 );
 
-has sth => (
-	is => 'rw',
-);
-
-has dsn => (
-	is => 'rw',
-	required => 1,
-);
-
-has user => (
-	is => 'rw',
-	required => 1,
-);
-
-has pwd => (
-	is => 'rw',
-	required => 1,
-);
-
 has dbh => (
 	is => 'rw',
 	default => \&dbh_builder,
