@@ -1,69 +1,8 @@
-package PLib::Services::Forker;
+package PLib::Service::Forker;
 
 use Moose;
 
 with 'PLib::Roles::Logger';
-
-=head1 NAME
-
-Project::Util::Forker
-
-=head1 SYNOPSIS
-
- use Project::Util::Forker;
-
- my @children = (1,2,3,4,5);   #-- The children. Each element will be passed
-                                #   to the subroutine below in one child process
-
- sub child_actions {           #-- What you want the children to do
-   my $i = shift;              #-- One of the elements of @children 
-   print "I'm child #$i!\n";
- }
-		
- my $fkr = ChopperTrading::Project::Util::Forker->new(  #-- The ctor
-   child_objects => \@children,
-   child_actions => \&child_actions,
- );
-	
- $fkr->forker;                 #-- Commence forking
-
-=head1 DESCRIPTION
-
-Simply calls the fork perl command in a safe, reusable way. Loops over
-each element of a list and forks a process, passing the list element to
-the specified forked subroutine.
-
-A more interesting example is to have each child object be an actual
-object like for a machine and then call a method like 'start_server' or
-something like:
-
- sub child_actions {
-   my $machine = shift;
-   $machine->start_server
- }
-
-This can be condensed further in the constructor and chained with
-the forker method for a compact call:
-
- ChopperTrading::Project::Util::Forker->new(
-   child_objects => \@children,
-   child_actions => sub { $_[0]->start_server },
- )->forker;
-
-Currently there is a a default maximum of 60 processes allowed. If the size of @children
-is greater than 60, forker will fail before any forking.
-
-=head1 AUTHORS
-
-Sean Blanton
-
-=head1 To Do
-
-1. Add “Chunking” to keep the max # of processes under a fixed amount, but accomplish a greater number of forked tasks via iteration. In order to start 80 servers, with a max process amount equal to 60, chunking would allow execution first of 60 forked processes, then after waiting for all of those to complete, execute the remaining 20. A queuing mechanism could possibly be implemented so a new process is forked as soon as one as reaped...just thinking out loud.
-
-2. Make this module obsolete by finding a way to use AnyEvent:: with Net::OpenSSH. Possibly an easy job. (Thanks to Jon Rockway)
-
-=cut
 
 has child_objects => (
 	is       => 'rw',
@@ -250,4 +189,65 @@ sub forker {
 no Moose;
 
 1;
+
+=head1 NAME
+
+Project::Util::Forker
+
+=head1 SYNOPSIS
+
+ use Project::Util::Forker;
+
+ my @children = (1,2,3,4,5);   #-- The children. Each element will be passed
+                                #   to the subroutine below in one child process
+
+ sub child_actions {           #-- What you want the children to do
+   my $i = shift;              #-- One of the elements of @children 
+   print "I'm child #$i!\n";
+ }
+		
+ my $fkr = ChopperTrading::Project::Util::Forker->new(  #-- The ctor
+   child_objects => \@children,
+   child_actions => \&child_actions,
+ );
+	
+ $fkr->forker;                 #-- Commence forking
+
+=head1 DESCRIPTION
+
+Simply calls the fork perl command in a safe, reusable way. Loops over
+each element of a list and forks a process, passing the list element to
+the specified forked subroutine.
+
+A more interesting example is to have each child object be an actual
+object like for a machine and then call a method like 'start_server' or
+something like:
+
+ sub child_actions {
+   my $machine = shift;
+   $machine->start_server
+ }
+
+This can be condensed further in the constructor and chained with
+the forker method for a compact call:
+
+ ChopperTrading::Project::Util::Forker->new(
+   child_objects => \@children,
+   child_actions => sub { $_[0]->start_server },
+ )->forker;
+
+Currently there is a a default maximum of 60 processes allowed. If the size of @children
+is greater than 60, forker will fail before any forking.
+
+=head1 AUTHORS
+
+Sean Blanton
+
+=head1 To Do
+
+1. Add Chunking to keep the max # of processes under a fixed amount, but accomplish a greater number of forked tasks via iteration. In order to start 80 servers, with a max process amount equal to 60, chunking would allow execution first of 60 forked processes, then after waiting for all of those to complete, execute the remaining 20. A queuing mechanism could possibly be implemented so a new process is forked as soon as one as reaped...just thinking out loud.
+
+2. Make this module obsolete by finding a way to use AnyEvent:: with Net::OpenSSH. Possibly an easy job. (Thanks to Jon Rockway)
+
+=cut
 

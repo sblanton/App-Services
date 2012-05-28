@@ -1,4 +1,4 @@
-package PLib::Services::Util_Container;
+package PLib::Container::Logger;
 
 use Moose;
 use Bread::Board;
@@ -9,10 +9,9 @@ sub BUILD {
 	$_[0]->build_container;
 }
 
-has log_conf_file => (
-	is      => 'rw',
-	isa     => 'Str',
-	default => 'log4perl.conf',
+has log_conf => (
+	is  => 'rw',
+	isa => 'Str',
 );
 
 has +name => (
@@ -26,12 +25,13 @@ sub build_container {
 
 	return container $s => as {
 
-		service 'log_conf_file' => $s->log_conf_file;
+		service 'log_conf' => $s->log_conf;
 
 		service 'logger_svc' => (
-			class         => 'PLib::Services::Logger',
-			lifecycle     => 'Singleton',
-			log_conf_file => 'log_conf_file'
+			class        => 'PLib::Service::Logger',
+			lifecycle    => 'Singleton',
+			dependencies => [ log_conf => 'log_conf' ]
+
 		);
 
 	}

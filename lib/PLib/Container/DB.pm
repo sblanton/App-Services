@@ -1,4 +1,4 @@
-package PLib::Services::DB_Container;
+package PLib::Container::DB;
 
 use Moose;
 use Bread::Board;
@@ -8,12 +8,6 @@ extends 'Bread::Board::Container';
 sub BUILD {
 	$_[0]->build_container;
 }
-
-has host_name => (
-	is      => 'rw',
-	isa     => 'Str',
-	default => '0.0.0.1',
-);
 
 has dsn => (
 	is      => 'rw',
@@ -48,8 +42,8 @@ has +name => (
 sub build_container {
 	my $s = shift;
 	
-	my $util_cntnr = PLib::Services::Util_Container->new(
-		log_config_file => $s->log_conf_file,
+	my $util_cntnr = PLib::Container::Logger->new(
+		log_conf => $s->log_conf,
 		name => 'util'
 	);
 

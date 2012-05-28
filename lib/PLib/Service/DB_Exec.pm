@@ -1,4 +1,4 @@
-package PLib::Services::DB_Exec;
+package PLib::Service::DB_Exec;
 
 use Moose;
 
@@ -34,20 +34,6 @@ has dbh => (
 	default => \&dbh_builder,
 	lazy => 1,
 );
-
-sub dbh_builder {
- my $s = shift;
-
- my $dbh = DBI->connect($s->dsn,$s->user,$s->pwd);
-
- unless ( $dbh ) {
-	$s->log->error(DBI->errstr());
-	return undef;
- }
-
- return $dbh;
-
-}
 
 sub exec {
 	my $s = shift or confess;

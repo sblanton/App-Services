@@ -1,10 +1,10 @@
-package PLib::Roles::Logger;  #-- Log service interface
+package PLib::Role::Logger;  #-- Log service interface
 
 use Moose::Role;
 
 has log_svc => (
         is       => 'rw',
-        isa      => 'Project::Services::Log',
+        isa      => 'PLib::Service::Logger',
         required => 1,
 );
 
