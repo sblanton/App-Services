@@ -1,30 +1,22 @@
-package PLib::Service::DB_Exec;
+package PLib::Service::DB_Conn;
 
 use Moose;
 
-with 'PLib::Roles::Logger';
+with 'PLib::Role::Logger';
 
 use DBI;
-
-has sql => (
-	is => 'rw',
-);
-
-has sth => (
-	is => 'rw',
-);
 
 has dsn => (
 	is => 'rw',
 	required => 1,
 );
 
-has user => (
+has db_user => (
 	is => 'rw',
 	required => 1,
 );
 
-has pwd => (
+has db_password => (
 	is => 'rw',
 	required => 1,
 );
@@ -38,7 +30,7 @@ has dbh => (
 sub dbh_builder {
  my $s = shift;
 
- my $dbh = DBI->connect($s->dsn,$s->user,$s->pwd);
+ my $dbh = DBI->connect($s->dsn,$s->db_user,$s->db_password);
 
  unless ( $dbh ) {
 	$s->log->error(DBI->errstr());
@@ -46,19 +38,6 @@ sub dbh_builder {
  }
 
  return $dbh;
-
-}
-
-sub exec {
-	my $s = shift or confess;
-
-	$s->dbh or confess;
-	$s->sql or confess;
-
-	$s->sth = $s->dbh->prepare($s->sql);
-	$s->sth->execute or die $DBI::errstr;
-
-	return sub { $s->sth->fetchrow_hashref() }
 
 }
 
