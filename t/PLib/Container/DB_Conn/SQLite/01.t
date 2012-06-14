@@ -2,8 +2,6 @@
 
 use common::sense;
 
-use Bread::Board;
-
 use Test::More qw(no_plan);
 
 use PLib::Container::DB_Conn::SQLite;
