@@ -1,11 +1,11 @@
-package PLib::Container::DB_Conn::SQLite;
+package App::Services::Container::DB_Conn::SQLite;
 
 use Moose;
 use Bread::Board;
 
 extends 'Bread::Board::Container';
 
-use PLib::Container::DB;
+use App::Services::Container::DB;
 
 sub BUILD {
 	$_[0]->build_container;

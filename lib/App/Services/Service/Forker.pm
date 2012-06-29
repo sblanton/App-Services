@@ -1,4 +1,4 @@
-package PLib::Service::Forker;
+package App::Services::Service::Forker;
 
 use Moose;
 

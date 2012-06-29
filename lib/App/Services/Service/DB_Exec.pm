@@ -1,4 +1,4 @@
-package PLib::Service::DB_Exec;
+package App::Services::Service::DB_Exec;
 
 use Moose;
 

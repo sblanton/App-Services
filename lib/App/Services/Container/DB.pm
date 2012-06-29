@@ -1,11 +1,11 @@
-package PLib::Container::DB;
+package App::Services::Container::DB;
 
 use Moose;
 use Bread::Board;
 
 extends 'Bread::Board::Container';
 
-use PLib::Container::Logger;
+use App::Services::Container::Logger;
 
 sub BUILD {
 	$_[0]->build_container;

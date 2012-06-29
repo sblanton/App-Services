@@ -1,4 +1,4 @@
-package PLib::Container::SSH;
+package App::Services::Container::SSH;
 
 use Moose;
 use Bread::Board;

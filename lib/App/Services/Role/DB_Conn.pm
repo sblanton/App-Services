@@ -1,4 +1,4 @@
-package PLib::Role::DB_Conn;  #-- Log service interface
+package App::Services::Role::DB_Conn;  #-- Log service interface
 
 use Moose::Role;
 

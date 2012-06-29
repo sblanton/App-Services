@@ -1,4 +1,4 @@
-package PLib::Service::DB_Conn;
+package App::Services::Service::DB_Conn;
 
 use Moose;
 

@@ -1,4 +1,4 @@
-package PLib::Service::Logger;
+package App::Services::Service::Logger;
 
 use Moose;
 

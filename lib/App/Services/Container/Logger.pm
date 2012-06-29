@@ -1,4 +1,4 @@
-package PLib::Container::Logger;
+package App::Services::Container::Logger;
 
 use Moose;
 use Bread::Board;

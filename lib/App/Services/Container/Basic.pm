@@ -1,4 +1,4 @@
-package PLib::Container::Basic;
+package App::Services::Container::Basic;
 
 use Moose;
 use Bread::Board;
