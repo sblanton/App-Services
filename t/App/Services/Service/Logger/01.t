@@ -2,9 +2,9 @@
 
 use common::sense;
 
-use Test::More qw(no_plan);
+use Bread::Board;
 
-use PLib::Container::DB_Conn::SQLite;
+use Test::More qw(no_plan);
 
 my $log_filename = 't_01.log';
 
@@ -16,14 +16,21 @@ log4perl.appender.main.filename=$log_filename
 log4perl.appender.main.layout   = Log::Log4perl::Layout::SimpleLayout
 /;
 
-my $cntnr = PLib::Container::DB_Conn::SQLite->new(
-	db_file => 't_01.sqlite',
-	log_conf => $log_conf,
-);
+my $cntnr = container 't_log_01' => as {
 
-my $svc = $cntnr->resolve( service => 'db_exec_svc' );
+	service log_conf => \$log_conf;
 
-ok($svc, "Create db exec service");
+	service 'logger_svc' => (
+		class        => 'App::Services::Service::Logger',
+		lifecycle    => 'Singleton',
+		dependencies => [ log_conf => 'log_conf']
+	);
+
+};
+
+my $svc = $cntnr->resolve( service => 'logger_svc' );
+
+ok($svc, "Create logger service");
 
 my $log = $svc->log;
 

@@ -2,7 +2,7 @@ package App::Services::Service::Forker;
 
 use Moose;
 
-with 'PLib::Role::Logger';
+with 'App::Services::Role::Logger';
 
 has child_objects => (
 	is       => 'rw',

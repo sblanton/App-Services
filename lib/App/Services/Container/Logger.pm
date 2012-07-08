@@ -28,7 +28,7 @@ sub build_container {
 		service 'log_conf' => $s->log_conf;
 
 		service 'logger_svc' => (
-			class        => 'PLib::Service::Logger',
+			class        => 'App::Services::Service::Logger',
 			lifecycle    => 'Singleton',
 			dependencies => [ log_conf => 'log_conf' ]
 

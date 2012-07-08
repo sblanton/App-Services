@@ -32,7 +32,7 @@ sub build_container {
 	
 	my $dsn = "dbi:SQLite:dbname=" . $s->db_file;
 
-	return PLib::Container::DB->new(
+	return App::Services::Container::DB->new(
 		dsn => $dsn,
 		db_user => '',
 		db_password => '',

@@ -2,7 +2,7 @@ package App::Services::Service::DB_Conn;
 
 use Moose;
 
-with 'PLib::Role::Logger';
+with 'App::Services::Role::Logger';
 
 use DBI;
 

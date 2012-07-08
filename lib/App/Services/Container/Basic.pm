@@ -51,12 +51,12 @@ sub build_container {
 		service 'host_name' => $s->host_name;
 
 		service 'logger_svc' => (
-			class     => 'PLib::Service::Logger',
+			class     => 'App::Services::Service::Logger',
 			lifecycle => 'Singleton',
 		);
 
 		service 'db_conn' => (    #-- raw DBI database handle
-			class        => 'PLib::Service::DB_Conn',
+			class        => 'App::Services::Service::DB_Conn',
 			dependencies => {
 				log_svc     => depends_on('log_svc'),
 				dsn         => 'dsn',
@@ -66,7 +66,7 @@ sub build_container {
 		);
 
 		service 'db_exec' => (
-			class        => 'PLib::Service::DB_Exec',
+			class        => 'App::Services::Service::DB_Exec',
 			dependencies => {
 				log_svc => depends_on('log_svc'),
 				db_conn => depends_on('db_conn'),
@@ -74,7 +74,7 @@ sub build_container {
 		);
 
 		service 'ssh_conn' => (
-			class        => 'PLib::Service::SSH_Conn',
+			class        => 'App::Services::Service::SSH_Conn',
 			dependencies => {
 				log_svc   => depends_on('log_svc'),
 				host_name => 'host_name',
@@ -82,7 +82,7 @@ sub build_container {
 		);
 
 		service 'ssh_exec' => (
-			class        => 'PLib::Service::SSH_Exec',
+			class        => 'App::Services::Service::SSH_Exec',
 			dependencies => {
 				log_svc  => depends_on('log_svc'),
 				ssh_conn => depends_on('ssh_conn'),
@@ -90,7 +90,7 @@ sub build_container {
 		);
 		
 		service 'forker' => (
-			class        => 'PLib::Service::Forker',
+			class        => 'App::Services::Service::Forker',
 			dependencies => {
 				log_svc  => depends_on('log_svc'),
 			}

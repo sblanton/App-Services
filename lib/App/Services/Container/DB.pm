@@ -44,7 +44,7 @@ has +name => (
 sub build_container {
 	my $s = shift;
 	
-	my $util_cntnr = PLib::Container::Logger->new(
+	my $util_cntnr = App::Services::Container::Logger->new(
 		log_conf => $s->log_conf,
 		name => 'log'
 	);
@@ -57,7 +57,7 @@ sub build_container {
 		service 'db_password' => $s->db_password;
 
 		service 'db_conn_svc' => (    #-- raw DBI database handle
-			class        => 'PLib::Services::DB_Conn',
+			class        => 'App::Services::Services::DB_Conn',
 			dependencies => {
 				log_svc     => depends_on('log/log_svc'),
 				dsn         => 'dsn',
@@ -67,7 +67,7 @@ sub build_container {
 		);
 
 		service 'db_exec_svc' => (
-			class        => 'PLib::Services::DB_Exec',
+			class        => 'App::Services::Services::DB_Exec',
 			dependencies => {
 				log_svc => depends_on('util/log_svc'),
 				db_conn => depends_on('db_conn'),

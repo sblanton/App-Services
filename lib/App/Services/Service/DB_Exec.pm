@@ -2,8 +2,8 @@ package App::Services::Service::DB_Exec;
 
 use Moose;
 
-with 'PLib::Role::Logger';
-with 'PLib::Role::DB_Conn';
+with 'App::Services::Role::Logger';
+with 'App::Services::Role::DB_Conn';
 
 use DBI;
 

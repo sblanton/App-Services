@@ -4,7 +4,7 @@ use Moose::Role;
 
 has db_svc => (
  is => 'rw',
- isa => 'PLib::Service::DB_Conn',
+ isa => 'App::Services::Service::DB_Conn',
  required => 1,
 );
 

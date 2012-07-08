@@ -4,7 +4,7 @@ use Moose::Role;
 
 has log_svc => (
         is       => 'rw',
-        isa      => 'PLib::Service::Logger',
+        isa      => 'App::Services::Service::Logger',
         required => 1,
 );
 

@@ -22,7 +22,7 @@ sub build_container {
 	return container $s => as {
 
 		service 'ssh_conn' => (
-			class        => 'PLib::Services::SSH_Conn',
+			class        => 'App::Services::Services::SSH_Conn',
 			dependencies => {
 				log_svc   => depends_on('log_svc'),
 				host_name => 'host_name',
@@ -30,7 +30,7 @@ sub build_container {
 		);
 
 		service 'ssh_exec' => (
-			class        => 'PLib::Services::SSH_Exec',
+			class        => 'App::Services::Services::SSH_Exec',
 			dependencies => {
 				log_svc  => depends_on('log_svc'),
 				ssh_conn => depends_on('ssh_conn'),
