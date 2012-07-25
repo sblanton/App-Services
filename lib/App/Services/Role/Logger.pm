@@ -1,4 +1,4 @@
-package App::Services::Logger;  #-- Log service interface
+package App::Services::Role::Logger;  #-- Log service interface
 
 use Moose::Role;
 

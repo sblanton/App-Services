@@ -10,14 +10,21 @@ sub BUILD {
 }
 
 has log_conf => (
-	is  => 'rw',
-	isa => 'Str',
+	is      => 'rw',
+	isa     => 'Str',
+	default => qq/ 
+log4perl.rootLogger=INFO, main
+
+log4perl.appender.main=Log::Log4perl::Appender::File
+log4perl.appender.main.filename=app_services.log
+log4perl.appender.main.layout   = Log::Log4perl::Layout::SimpleLayout
+/,
 );
 
 has +name => (
 	is      => 'rw',
 	isa     => 'Str',
-	default => 'plib_util_svc',
+	default => 'logger_svc',
 );
 
 sub build_container {
