@@ -1,26 +1,17 @@
-package App::Services::Role::Logger;  #-- Log service interface
+package App::Services::Role::Logger;    #-- Log service interface
 
 use Moose::Role;
 
-has log_svc => (
-        is       => 'rw',
-        isa      => 'App::Services::Service::Logger',
-        required => 1,
-);
+sub BUILD {
+	$_[0]->logger_svc->log_category( ref( $_[0] ) );
+	
+}
 
-has log_category => (
- is => 'rw',
- isa => 'Str',
- default => sub { ref($_[0]) },
- lazy => 1,
-);
-
-has log => ( #-- The actual Log::Log4perl logger. Type?
-	is      => 'rw',
-	default => sub {
-		$_[0]->log_svc->log_category($_[0]->log_category);
-		$_[0]->log_svc->get_logger();
-	},
+has logger_svc => (
+	is       => 'rw',
+	isa      => 'App::Services::Service::Logger',
+	handles => [qw( log log_category)],
+	required => 1,
 );
 
 no Moose::Role;
