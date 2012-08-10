@@ -1,6 +1,8 @@
-package App::Services::DBS::Conn::Service;
+package App::Services::DB::Conn::Service;
 
-use Moose;
+use Moo;
+
+use common::sense;
 
 with 'App::Services::Logger::Role';
 
@@ -41,7 +43,7 @@ sub dbh_builder {
 
 }
 
-no Moose;
+no Moo;
 
 1;
 

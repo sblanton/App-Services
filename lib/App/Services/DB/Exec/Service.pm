@@ -1,6 +1,8 @@
-package App::Services::DBS::Exec::Service;
+package App::Services::DB::Exec::Service;
 
-use Moose;
+use Moo;
+
+use common::sense;
 
 with 'App::Services::Logger::Role';
 with 'App::Services::DB::Conn::Role';
@@ -9,33 +11,23 @@ use DBI;
 
 has sql => ( is => 'rw', );
 
-sub exec_sql {
-	my $s = shift or confess;
-
-	my $sql = shift or $s->log->logconfess("No SQL supplied to exec_sql");
-	$s->log->info($sql);
-	$s->sql($sql);
-	return $s->exec;
-
-}
-
 has return_code => (
 	is      => 'rw',
-	default => 1,
+	default => sub {1},
 );
 
 has error_message => (
 	is      => 'rw',
-	default => '',
+	default => sub {''},
 );
 
 has array_ref => (
 	is      => 'rw',
-	default => undef,
+	default => sub { undef },
 );
 
 sub validate {
-	my $s = shift or confess;
+	my $s = shift or die;
 
 	$s->dbh or confess("dbh handle required for &write_run");
 
@@ -52,8 +44,18 @@ sub validate {
 	}
 }
 
+sub exec_sql {
+	my $s = shift or die;
+
+	my $sql = shift or $s->log->logconfess("No SQL supplied to exec_sql");
+	$s->log->info($sql);
+	$s->sql($sql);
+	return $s->exec;
+
+}
+
 sub exec {
-	my $s = shift or confess;
+	my $s = shift or die;
 
 	return unless $s->validate;
 
@@ -89,7 +91,7 @@ sub exec {
 }
 
 sub exec_scalar {
-	my $s = shift or confess;
+	my $s = shift or die;
 
 	return unless $s->validate;
 
