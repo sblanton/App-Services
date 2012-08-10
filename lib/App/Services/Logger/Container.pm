@@ -1,4 +1,4 @@
-package App::Services::Container::Logger;
+package App::Services::Logger::Container;
 
 use Moose;
 use Bread::Board;
@@ -11,12 +11,11 @@ sub BUILD {
 
 has log_conf => (
 	is      => 'rw',
-	isa     => 'Str',
 	default => qq/ 
 log4perl.rootLogger=INFO, main
 
-log4perl.appender.main=Log::Log4perl::Appender::File
-log4perl.appender.main.filename=app_services.log
+log4perl.appender.main=Log::Log4perl::Appender::Screen
+#log4perl.appender.main.filename=app_services.log
 log4perl.appender.main.layout   = Log::Log4perl::Layout::SimpleLayout
 /,
 );
@@ -35,7 +34,7 @@ sub build_container {
 		service 'log_conf' => $s->log_conf;
 
 		service 'logger_svc' => (
-			class        => 'App::Services::Service::Logger',
+			class        => 'App::Services::Logger::Service',
 			lifecycle    => 'Singleton',
 			dependencies => [ log_conf => 'log_conf' ]
 

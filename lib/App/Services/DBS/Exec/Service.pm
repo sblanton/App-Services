@@ -1,9 +1,9 @@
-package App::Services::Service::DB_Exec;
+package App::Services::DBS::Exec::Service;
 
 use Moose;
 
-with 'App::Services::Role::Logger';
-with 'App::Services::Role::DB_Conn';
+with 'App::Services::Logger::Role';
+with 'App::Services::DB::Conn::Role';
 
 use DBI;
 
@@ -98,14 +98,6 @@ sub exec_scalar {
 	return $s->dbh->selectrow_array( $s->sql );
 
 }
-
-sub conn_refresh {
-	my $s = shift or confess;
-
-	$s->dbh_refresh;
-
-}
-
 
 no Moose;
 

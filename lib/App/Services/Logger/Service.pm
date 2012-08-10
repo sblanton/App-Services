@@ -1,4 +1,4 @@
-package App::Services::Service::Logger;
+package App::Services::Logger::Service;
 
 use Moose;
 

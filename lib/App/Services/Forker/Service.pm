@@ -1,8 +1,8 @@
-package App::Services::Service::Forker;
+package App::Services::Forker::Service;
 
 use Moose;
 
-with 'App::Services::Role::Logger';
+with 'App::Services::Logger::Role';
 
 has child_objects => (
 	is       => 'rw',

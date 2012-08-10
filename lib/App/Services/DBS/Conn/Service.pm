@@ -1,8 +1,8 @@
-package App::Services::Service::DB_Conn;
+package App::Services::DBS::Conn::Service;
 
 use Moose;
 
-with 'App::Services::Role::Logger';
+with 'App::Services::Logger::Role';
 
 use DBI;
 

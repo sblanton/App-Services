@@ -16,28 +16,28 @@ log4perl.appender.main.filename=$log_filename
 log4perl.appender.main.layout   = Log::Log4perl::Layout::SimpleLayout
 /;
 
-my $cntnr = container 't_log_01' => as {
+my $cntnr = container '01_basic_t' => as {
 
 	service log_conf => \$log_conf;
 
 	service 'logger_svc' => (
 		class        => 'App::Services::Service::Logger',
 		lifecycle    => 'Singleton',
-		dependencies => [ log_conf => 'log_conf']
+		dependencies => [ log_conf => 'log_conf' ]
+	);
+
+	service 'obj_store_svc' => (
+		class      => 'App::Services::Service::ObjStore',
+		depends_on => { logger_svc => depends_on('logger_svc') },
 	);
 
 };
 
-my $svc = $cntnr->resolve( service => 'logger_svc' );
+my $lsvc = $cntnr->resolve( service => 'logger_svc' );
 
-ok($svc, "Create logger service");
+ok( $lsvc, "Create logger service" );
 
-my $log = $svc->log;
+my $svc = $cntnr->resolve( service => 'obj_store_svc' );
 
-ok($log, "Got Log4perl logger");
+ok( $svc, "Create object store service" );
 
-$log->info("Log success!!");
-
-ok( -f $log_filename, "Log file created");
-
-unlink( -f $log_filename);

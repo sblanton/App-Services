@@ -1,8 +1,8 @@
-package App::Services::Role::DB_Conn;  #-- Log service interface
+package App::Services::DBS::DB_Conn::Role;  #-- Log service interface
 
 use Moose::Role;
 
-has db_svc => (
+has db_conn_svc => (
  is => 'rw',
  isa => 'App::Services::Service::DB_Conn',
  handles => ['dbh'],

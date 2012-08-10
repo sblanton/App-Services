@@ -1,11 +1,11 @@
-package App::Services::Container::DB;
+package App::Services::DBS::Container;
 
 use Moose;
 use Bread::Board;
 
 extends 'Bread::Board::Container';
 
-use App::Services::Container::Logger;
+use App::Services::Logger::Container;
 
 sub BUILD {
 	$_[0]->build_container;
@@ -31,24 +31,22 @@ has db_password => (
 
 has log_conf => (
 	is      => 'rw',
-	isa     => 'Str',
 	default => 'log4perl.conf',
 );
 
 has +name => (
 	is      => 'rw',
 	isa     => 'Str',
-	default => 'svc',
+	default => 'db',
 );
 
 sub build_container {
 	my $s = shift;
 	
-	my $util_cntnr = App::Services::Container::Logger->new(
+	my $util_cntnr = App::Services::Logger::Container->new(
 		log_conf => $s->log_conf,
 		name => 'log'
 	);
-
 
 	container $s => as {
 
@@ -57,9 +55,9 @@ sub build_container {
 		service 'db_password' => $s->db_password;
 
 		service 'db_conn_svc' => (    #-- raw DBI database handle
-			class        => 'App::Services::Services::DB_Conn',
+			class        => 'App::Services::DBS::Conn::Service',
 			dependencies => {
-				log_svc     => depends_on('log/log_svc'),
+				logger_svc     => depends_on('log/logger_svc'),
 				dsn         => 'dsn',
 				db_user     => 'db_user',
 				db_password => 'db_password',
@@ -67,10 +65,10 @@ sub build_container {
 		);
 
 		service 'db_exec_svc' => (
-			class        => 'App::Services::Services::DB_Exec',
+			class        => 'App::Services::DBS::Exec::Service',
 			dependencies => {
-				log_svc => depends_on('util/log_svc'),
-				db_conn => depends_on('db_conn'),
+				logger_svc => depends_on('log/logger_svc'),
+				db_conn => depends_on('db_conn_svc'),
 			}
 		);
 

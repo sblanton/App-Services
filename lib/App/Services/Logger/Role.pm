@@ -1,16 +1,16 @@
-package App::Services::Role::Logger;    #-- Log service interface
+package App::Services::Logger::Role;    #-- Log service interface
 
 use Moose::Role;
 
 sub BUILD {
 	$_[0]->logger_svc->log_category( ref( $_[0] ) );
-	
+
 }
 
 has logger_svc => (
 	is       => 'rw',
-	isa      => 'App::Services::Service::Logger',
-	handles => [qw( log log_category)],
+	isa      => 'App::Services::Logger::Service',
+	handles  => 'App::Services::Logger::Service',
 	required => 1,
 );
 

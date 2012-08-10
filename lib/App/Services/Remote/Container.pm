@@ -1,4 +1,4 @@
-package App::Services::Container::SSH;
+package App::Services::Remote::Container;
 
 use Moose;
 use Bread::Board;
