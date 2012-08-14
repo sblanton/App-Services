@@ -16,7 +16,7 @@ sub BUILD {
 has db_file => (
 	is      => 'rw',
 	isa     => sub { ref($_[0]) eq 'SCALAR' and $_[0] =~ /^\w$/ },
-	default => sub { 'tmp.sqlite' },
+	default => sub { ':memory:' },
 );
 
 has log_conf => (

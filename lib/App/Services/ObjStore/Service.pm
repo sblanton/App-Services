@@ -1,11 +1,13 @@
 package App::Services::ObjStore::Service;
 
 use Moo;
-with 'App::Services::Role::Logger';
+with 'App::Services::Logger::Role';
 
 use common::sense;
 
 use KiokuDB;
+
+has kdb => ( is => 'rwp');
 
 our $kdb;
 
@@ -15,7 +17,9 @@ sub BUILD {
 
 sub init_object_store {
 	my $s = shift or die;
-	our $kdb = KiokuDB->connect( "dbi:SQLite:dbname=$ENV{TEMP}/.app-services-obj-store-$$.db", create => 1 );
+	$s->_set_kdb( KiokuDB->connect( "dbi:SQLite:dbname=$ENV{TEMP}/.app-services-obj-store-$$.db", create => 1 ) );
+	
+	$s->kdb or $s->log->logconfess();
 
 }
 
@@ -24,7 +28,8 @@ sub add_object {
 	my $s   = shift or die;
 	my $obj = shift or $s->log->fatal("No object passed");
 	my $id  = shift;
-	our $kdb;
+
+	my $kdb = $s->kdb;
 	
 	unless ( $kdb ) {
 		$s->log->logconfess("Must call 'init_object_store' first");
@@ -68,7 +73,8 @@ sub get_object {
 	my $s  = shift or die;
 	my $id = shift or $s->log->fatal("No object id passed");
 
-	our $kdb;
+	my $kdb = $s->kdb;
+
 	unless ( $kdb ) {
 		$s->log->logconfess("Must call 'init_object_store' first");
 	}
@@ -88,7 +94,8 @@ sub get_object {
 sub all_objects {
 	my $s = shift or die;
 
-	our $kdb;
+	my $kdb = $s->kdb;
+
 	unless ( $kdb ) {
 		$s->log->logconfess("Must call 'init_object_store' first");
 	}
