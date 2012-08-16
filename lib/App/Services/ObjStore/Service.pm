@@ -1,82 +1,108 @@
 package App::Services::ObjStore::Service;
 
 use Moo;
-with 'App::Services::Logger::Role';
 
 use common::sense;
 
+with 'App::Services::Logger::Role';
+
 use KiokuDB;
 
-has kdb => ( is => 'rwp');
+has kdb => ( is => 'rw' );
 
-our $kdb;
+has kdb_file => (
+	is      => 'rw',
+	default => sub { "dbi:SQLite:dbname=/tmp/.app-services-obj-store-$$.db" }
+);
 
-sub BUILD {
-	$_[0]->init_object_store;
-}
+has label => (
+	is => 'rw',
+	default => sub { $$ },
+);
 
 sub init_object_store {
 	my $s = shift or die;
-	$s->_set_kdb( KiokuDB->connect( "dbi:SQLite:dbname=$ENV{TEMP}/.app-services-obj-store-$$.db", create => 1 ) );
-	
+
+	$s->kdb( KiokuDB->connect( $s->kdb_file, create => 1 ) );
+
 	$s->kdb or $s->log->logconfess();
+
+}
+
+sub delete_object_store {
+	my $s = shift or die;
+
+	unlink $s->kdb_file if -d $s->kdb_file;
+
+	$s->log->warn("Couldn't delete object store") if -d $s->kdb_file;
+
+	$s->kdb(undef);
+
+	return $s->kdb;
 
 }
 
 sub add_object {
 
 	my $s   = shift or die;
-	my $obj = shift or $s->log->fatal("No object passed");
+	my $obj = shift or $s->log->fatal($s->label . ": No object passed");
 	my $id  = shift;
 
 	my $kdb = $s->kdb;
-	
-	unless ( $kdb ) {
-		$s->log->logconfess("Must call 'init_object_store' first");
+	my $log = $s->log;
+
+	$log->debug($s->label . " Entering add_object");
+
+	unless ($kdb) {
+		$s->log->logconfess($s->label . ": Must call 'init_object_store' first");
 	}
 
 	my $new_id;
 
+	my $rc;
+
 	do {
+		$log->info($s->label . ": Inserting obj");
+
 		eval {
 			($new_id) = $kdb->txn_do(
 				scope => 1,
 				body  => sub {
 					if ($id) {
-						$kdb->insert( $id => Simple->new );
-						
+						$kdb->insert( $id => $obj );
+
 					} else {
-						$kdb->insert( Simple->new );
-						
+						$kdb->insert($obj);
+
 					}
 				}
 			);
 		};
 
 		if ($@) {
-			warn "$$ failed to commit, sleeping for random interval and retrying";
+			$s->log->warn( $s->label . ": failed to commit to (" . $s->kdb . "): [ $@ ], sleeping for random interval and retrying" );
 			my $i = rand(0.1);
 			sleep $i;
-			redo;
-			
+
 		} else {
-			warn "$$ successfully comitted";
+			$log->info($s->label . ": successfully comitted");
+			$rc = 1;
 		}
 
-	} while ( !$@ );
-	
+	} until ($rc);
+
 	return $new_id;
 
 }
 
 sub get_object {
 	my $s  = shift or die;
-	my $id = shift or $s->log->fatal("No object id passed");
+	my $id = shift or $s->log->fatal($s->label . ": No object id passed");
 
 	my $kdb = $s->kdb;
 
-	unless ( $kdb ) {
-		$s->log->logconfess("Must call 'init_object_store' first");
+	unless ($kdb) {
+		$s->log->logconfess($s->label . ":Must call 'init_object_store' first");
 	}
 
 	my $obj;
@@ -96,11 +122,11 @@ sub all_objects {
 
 	my $kdb = $s->kdb;
 
-	unless ( $kdb ) {
-		$s->log->logconfess("Must call 'init_object_store' first");
+	unless ($kdb) {
+		$s->log->logconfess($s->label . ":Must call 'init_object_store' first");
 	}
-	
-	return $kdb->all_objects;
+
+	return $kdb->all_objects->items;
 
 }
 

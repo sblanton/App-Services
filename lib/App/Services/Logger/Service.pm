@@ -21,7 +21,7 @@ has log_category => (
 has log => (    #-- The actual Log::Log4perl logger. Type?
 	is      => 'rw',
 	default => sub {
-		$_[0]->log_category( $_[0]->log_category );
+		$_[0]->log_category( ref($_[0]) );
 		$_[0]->get_logger();
 	},
 	lazy => 1,
