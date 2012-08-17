@@ -6,7 +6,6 @@ use Bread::Board;
 use Test::More qw(no_plan);
 
 use App::Services::ObjStore::Container;
-use App::Services::Forker::Container;
 
 use MyObj;
 
@@ -18,16 +17,13 @@ log4j.appender.stdout.layout.ConversionPattern=%-6p| %m%n
 
 /;
 
-my $os_cntnr = App::Services::ObjStore::Container->new();
-my $frkr_cntnr = App::Services::Forker::Container->new();
+my $cntnr = App::Services::ObjStore::Container->new();
 
 #my $lsvc = $cntnr->resolve( service => 'log/logger_svc' );
 #
 #ok( $lsvc, "Create logger service" );
 
-__END__
-
-my $os_svc = $os_cntnr->resolve( service => 'obj_store_svc' );
+my $svc = $cntnr->resolve( service => 'obj_store_svc' );
 
 ok( $svc, "Create object store service" );
 
