@@ -1,6 +1,6 @@
 package App::Services::ObjStore::Container;
 
-use Moo;
+use Moose;
 
 use common::sense;
 
@@ -51,7 +51,7 @@ sub build_container {
 	return $s;
 }
 
-no Moo;
+no Moose;
 
 1;
 

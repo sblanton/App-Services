@@ -1,6 +1,6 @@
 package App::Services::ObjStore::Service;
 
-use Moo;
+use Moose;
 
 use common::sense;
 
@@ -62,7 +62,7 @@ sub add_object {
 	my $rc;
 
 	do {
-		$log->info($s->label . ": Inserting obj");
+		$log->debug($s->label . ": Inserting obj");
 
 		eval {
 			($new_id) = $kdb->txn_do(
@@ -85,7 +85,7 @@ sub add_object {
 			sleep $i;
 
 		} else {
-			$log->info($s->label . ": successfully comitted");
+			$log->debug($s->label . ": successfully comitted");
 			$rc = 1;
 		}
 
@@ -130,6 +130,6 @@ sub all_objects {
 
 }
 
-no Moo;
+no Moose;
 
 1;

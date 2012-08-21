@@ -20,7 +20,7 @@ log4perl.appender.main.layout   = Log::Log4perl::Layout::SimpleLayout
 
 has +name => (
 	is      => 'rw',
-#	isa     => 'Str',
+	isa     => 'Str',
 	default => sub { 'logger' },
 );
 
@@ -29,11 +29,7 @@ sub build_container {
 
 	return container $s => as {
 
-		service 'log_conf' => \"
-log4perl.rootLogger=INFO, main
-log4perl.appender.main=Log::Log4perl::Appender::Screen
-log4perl.appender.main.layout   = Log::Log4perl::Layout::SimpleLayout
-";
+		service 'log_conf' => $s->log_conf;
 
 		service 'logger_svc' => (
 			class        => 'App::Services::Logger::Service',

@@ -1,6 +1,6 @@
 package App::Services::Forker::Container;
 
-use Moo;
+use Moose;
 
 use common::sense;
 
@@ -21,14 +21,14 @@ has log_conf => (
 
 has child_objects => (
 	is     => 'rw',
-	isa    => sub { ref($_[0]) eq 'ARRAY' },
+	isa    => 'ArrayRef',
 	required => 1,
 
 );
 
 has child_actions => (
 	is       => 'rw',
-	isa      => sub { ref( $_[0] ) eq 'CODE' },
+	isa      => 'CodeRef',
 	required => 1,
 );
 
@@ -66,7 +66,7 @@ sub build_container {
 	return $s;
 }
 
-no Moo;
+no Moose;
 
 1;
 

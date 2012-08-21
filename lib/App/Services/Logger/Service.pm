@@ -1,6 +1,6 @@
 package App::Services::Logger::Service;
 
-use Moo;
+use Moose;
 
 use common::sense;
 
@@ -45,12 +45,12 @@ sub get_logger {
 	}
 
 	my $log = Log::Log4perl->get_logger($category);
-	$log->info("Created logger for category '$category'");
+	$log->debug("Created logger for category '$category'");
 
 	return $log;
 }
 
-no Moo;
+no Moose;
 
 1;
 

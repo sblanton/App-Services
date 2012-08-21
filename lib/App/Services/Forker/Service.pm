@@ -46,6 +46,12 @@ has no_fork => (
 	default => 0,
 );
 
+has chunks => (
+	is => 'rw',
+	isa => 'Int',
+	default => 0,
+);
+
 sub forker {
 	my $s = shift;
 
