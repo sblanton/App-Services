@@ -17,7 +17,9 @@ log4j.appender.stdout.layout.ConversionPattern=%-6p| %m%n
 
 /;
 
-my $cntnr = App::Services::ObjStore::Container->new();
+my $cntnr = App::Services::ObjStore::Container->new(
+	log_conf => \$log_conf,
+);
 
 #my $lsvc = $cntnr->resolve( service => 'log/logger_svc' );
 #
@@ -74,7 +76,7 @@ my @obj_vals;
 
 foreach my $obj ( $svc->all_objects ) {
 
-	ok( ( ref($obj) eq 'MyObj' ), "$$: Got object ($i)" );
+	ok( ( ref($obj) eq 'MyObj' ), "parent ($$): Got object ($i)" );
 
 	push @obj_vals, $obj->foo;
 	$svc->log->info("$$: Found obj with foo: " . $obj->foo);
