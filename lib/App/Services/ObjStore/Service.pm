@@ -10,9 +10,15 @@ use KiokuDB;
 
 has kdb => ( is => 'rw' );
 
-has kdb_file => (
+has kdb_dsn => (
 	is      => 'rw',
-	default => sub { "dbi:SQLite:dbname=/tmp/.app-services-obj-store-$$.db" }
+	default => sub { "dbi:SQLite:dbname=" . $_[0]->obj_store_file },
+	lazy => 1,
+);
+
+has obj_store_file => (
+	is => 'rw',
+	default => "/tmp/.app-services-obj-store-$$.db",
 );
 
 has label => (
@@ -23,18 +29,25 @@ has label => (
 sub init_object_store {
 	my $s = shift or die;
 
-	$s->kdb( KiokuDB->connect( $s->kdb_file, create => 1 ) );
+	$s->kdb( KiokuDB->connect( $s->kdb_dsn, create => 1 ) );
 
 	$s->kdb or $s->log->logconfess();
+
+}
+
+sub delete {
+	my $s = shift or die;
+	
+	$s->kdb->delete(@_);
 
 }
 
 sub delete_object_store {
 	my $s = shift or die;
 
-	unlink $s->kdb_file if -d $s->kdb_file;
+	unlink $s->obj_store_file if -d $s->obj_store_file;
 
-	$s->log->warn("Couldn't delete object store") if -d $s->kdb_file;
+	$s->log->warn("Couldn't delete object store") if -d $s->obj_store_file;
 
 	$s->kdb(undef);
 

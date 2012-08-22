@@ -18,36 +18,46 @@ sub BUILD {
 
 has log_conf => (
 	is      => 'rw',
-	default => sub {'log4perl.conf' },
+	default => sub { 'log4perl.conf' },
+);
+
+has obj_store_file => (
+	is      => 'rw',
+	default => "/tmp/.app-services-obj-store-$$.db",
+
 );
 
 has +name => (
-	is      => 'rw',
-#	isa     => 'Str',
+	is => 'rw',
+
+	#	isa     => 'Str',
 	default => sub { 'obj_store' },
 );
 
 sub build_container {
 	my $s = shift;
-	
+
 	my $log_cntnr = App::Services::Logger::Container->new(
 		log_conf => $s->log_conf,
-		name => 'log'
+		name     => 'log'
 	);
 
 	container $s => as {
+
+		service 'obj_store_file' => $s->obj_store_file;
 
 		service 'obj_store_svc' => (
 			class        => 'App::Services::ObjStore::Service',
 			dependencies => {
 				logger_svc => depends_on('log/logger_svc'),
+				obj_store_file => 'obj_store_file',
 			}
 		);
 
 	};
-	
+
 	$s->add_sub_container($log_cntnr);
-	
+
 	return $s;
 }
 
