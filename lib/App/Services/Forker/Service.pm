@@ -17,8 +17,8 @@ has child_actions => (
 );
 
 has child_labels => (
-	is  => 'rw',
-	isa => 'ArrayRef[Str]',
+	is      => 'rw',
+	isa     => 'ArrayRef[Str]',
 	default => sub { [] },
 );
 
@@ -47,8 +47,8 @@ has no_fork => (
 );
 
 has chunks => (
-	is => 'rw',
-	isa => 'Int',
+	is      => 'rw',
+	isa     => 'Int',
 	default => 0,
 );
 
@@ -60,6 +60,9 @@ sub forker {
 
 	my $ra = $s->child_objects;    #-- reference to an array
 	my $rs = $s->child_actions;    #-- reference to a sub
+
+$s->timeout(0);
+#$s->no_fork(1);
 
 	$log->logconfess("Max procs too high!")
 	  if scalar( @{$ra} ) > $s->max_procs;
@@ -73,28 +76,33 @@ sub forker {
 
 	foreach my $obj ( @{$ra} ) {
 
-		my $child_name = ${$s->{child_labels}}[$child_number] // "${child_number}";  #//
+		my $child_name = ${ $s->{child_labels} }[$child_number] // "${child_number}";    #//
 
 		if ( $s->no_fork ) {
 			$log->debug("Pseudo $child_name: Spawned");
 
 			my $result;
 
-			eval {
-				local $SIG{ALRM} = sub { die "Process timed out"; };
-				alarm $s->timeout;
+			if ( $s->timeout ) {
+				eval {
+					local $SIG{ALRM} = sub { die "Process timed out"; };
+					alarm $s->timeout;
+					$result = &{$rs}($obj);
+					alarm 0;
+				};
+
+				if ( $@ && $@ =~ 'Process timed out' ) {    #-- if there is an error and the error message is from the alarm signal handler...
+					$log->logconfess( "Pseudo ${child_name}: Timed out (" . $s->timeout . "s)" );    # propagate unexpected errors
+					                                                                                 # timed out
+				} elsif ($@) {                                                                       #-- Else there was an error in the eval block, but it wasn't from 'alarm'
+					alarm 0;                                                                         #-- Turn off alarm
+					$log->error("Pseudo ${child_name}: $@");
+					exit 1;
+				}
+				
+			} else {
 				$result = &{$rs}($obj);
-				alarm 0;
-			};
-
-			if ( $@ && $@ =~ 'Process timed out' ) {    #-- if there is an error and the error message is from the alarm signal handler...
-				$log->logconfess( "Pseudo ${child_name}: Timed out (" . $s->timeout . "s)" );    # propagate unexpected errors
-				                                                                            # timed out
-			} elsif ($@) {                                                                  #-- Else there was an error in the eval block, but it wasn't from 'alarm'
-				alarm 0;                                                                    #-- Turn off alarm
-				$log->error("Pseudo ${child_name}: $@");
-				exit 1;
-
+				
 			}
 
 			$log->debug("Pseudo-child ${child_name}: Exiting");
@@ -106,7 +114,7 @@ sub forker {
 			  unless defined $pid;
 
 			if ( $pid == 0 ) {
-				
+
 				$child_name .= " ($$)";
 
 				#-- I'm a child
@@ -114,30 +122,36 @@ sub forker {
 
 				my $result;
 
-				eval {
-					local $SIG{ALRM} = sub { die "Process timed out"; };
-					alarm $s->timeout;
+				if ( $s->timeout ) {
+					eval {
+						local $SIG{ALRM} = sub { die "Process timed out"; };
+						alarm $s->timeout;
+						$result = &{$rs}($obj);
+						alarm 0;
+					};
+
+					alarm 0;    #-- Turn off alarm when eval breaks for a different reason than timeout
+
+					if ( $@ && $@ =~ 'Process timed out' ) {
+						$log->logconfess( "Child $child_name: Timed out (" . $s->timeout . "s)" );    # propagate unexpected errors
+						                                                                              # timed out
+					} elsif ($@) {
+						$log->error("Child $child_name: $@");
+						exit 1;
+
+					}
+					
+				} else {
 					$result = &{$rs}($obj);
-					alarm 0;
-				};
-
-				alarm 0;    #-- Turn off alarm when eval breaks for a different reason than timeout
-
-				if ( $@ && $@ =~ 'Process timed out' ) {
-					$log->logconfess( "Child $child_name: Timed out (" . $s->timeout . "s)" );    # propagate unexpected errors
-					                                                                            # timed out
-				} elsif ($@) {
-					$log->error("Child $child_name: $@");
-					exit 1;
-
+					
 				}
+				
+				my $rc = defined $result ? 0 : 1;                                                     #-- perl convention (undef = error) => shell convention (>0 = error)
 
-				my $rc = defined $result ? 0 : 1;                                               #-- perl convention (undef = error) => shell convention (>0 = error)
-
-				$result = '' unless defined $result;                                            #-- turn undef into a string
+				$result = '' unless defined $result;                                                  #-- turn undef into a string
 
 				$log->debug("Child $child_name: Exiting with result=<$result>,rc=<$rc>");
-				exit $rc;                                                                       #-- Critical! Don't forget!
+				exit $rc;                                                                             #-- Critical! Don't forget!
 
 			} else {
 
@@ -155,7 +169,7 @@ sub forker {
 
 	my $forker_rc = 1;
 
-	return @child_pids if $s->no_waitpid;                                                       #-- Maybe you want to do something else while the children are operating
+	return @child_pids if $s->no_waitpid;    #-- Maybe you want to do something else while the children are operating
 
 	unless ( $s->no_fork ) {
 		$log->debug("Parent: Waiting for children to exit");

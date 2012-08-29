@@ -45,7 +45,7 @@ sub delete {
 sub delete_object_store {
 	my $s = shift or die;
 
-	unlink $s->obj_store_file if -d $s->obj_store_file;
+	unlink $s->obj_store_file if -f $s->obj_store_file;
 
 	$s->log->warn("Couldn't delete object store") if -d $s->obj_store_file;
 
