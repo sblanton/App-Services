@@ -1,6 +1,6 @@
 package App::Services::Logger::Container;
 
-use Moose;
+use Moo;
 use Bread::Board;
 
 extends 'Bread::Board::Container';
@@ -20,7 +20,6 @@ log4perl.appender.main.layout   = Log::Log4perl::Layout::SimpleLayout
 
 has +name => (
 	is      => 'rw',
-	isa     => 'Str',
 	default => sub { 'logger' },
 );
 
@@ -42,7 +41,7 @@ sub build_container {
 
 }
 
-no Moose;
+no Moo;
 
 1;
 

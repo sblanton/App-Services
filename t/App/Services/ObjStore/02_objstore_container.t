@@ -9,18 +9,7 @@ use App::Services::ObjStore::Container;
 
 use MyObj;
 
-my $log_conf = qq/ 
-log4perl.rootLogger=INFO, main
-
-log4perl.appender.main=Log::Log4perl::Appender::Screen
-log4perl.appender.main.layout   = Log::Log4perl::Layout::SimpleLayout
-/;
-
 my $cntnr = App::Services::ObjStore::Container->new();
-
-#my $lsvc = $cntnr->resolve( service => 'log/logger_svc' );
-#
-#ok( $lsvc, "Create logger service" );
 
 my $svc = $cntnr->resolve( service => 'obj_store_svc' );
 

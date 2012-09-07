@@ -1,6 +1,6 @@
 package App::Services::Logger::Service;
 
-use Moose;
+use Moo;
 
 use common::sense;
 
@@ -50,7 +50,7 @@ sub get_logger {
 	return $log;
 }
 
-no Moose;
+no Moo;
 
 1;
 

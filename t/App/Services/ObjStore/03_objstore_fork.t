@@ -10,16 +10,8 @@ use App::Services::Forker::Container;
 
 use MyObj;
 
-my $log_conf = qq/ 
-log4perl.rootLogger=INFO, stdout
-log4j.appender.stdout=org.apache.log4j.ConsoleAppender
-log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
-log4j.appender.stdout.layout.ConversionPattern=%-6p| %m%n
-
-/;
-
 my $os_cntnr = App::Services::ObjStore::Container->new();
-my $frkr_cntnr = App::Services::Forker::Container->new();
+#my $frkr_cntnr = App::Services::Forker::Container->new();
 
 #my $lsvc = $cntnr->resolve( service => 'log/logger_svc' );
 #

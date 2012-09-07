@@ -18,7 +18,13 @@ sub BUILD {
 
 has log_conf => (
 	is      => 'rw',
-	default => sub { 'log4perl.conf' },
+	default => sub {
+		\qq/ 
+log4perl.rootLogger=INFO, main
+log4perl.appender.main=Log::Log4perl::Appender::Screen
+log4perl.appender.main.layout   = Log::Log4perl::Layout::SimpleLayout
+/;
+	},
 );
 
 has obj_store_file => (
@@ -49,7 +55,7 @@ sub build_container {
 		service 'obj_store_svc' => (
 			class        => 'App::Services::ObjStore::Service',
 			dependencies => {
-				logger_svc => depends_on('log/logger_svc'),
+				logger_svc     => depends_on('log/logger_svc'),
 				obj_store_file => 'obj_store_file',
 			}
 		);

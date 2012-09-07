@@ -4,8 +4,6 @@ use Moo;
 
 use common::sense;
 
-#use MooX::Types::MooseLike::Base;
-
 use Bread::Board;
 
 extends 'Bread::Board::Container';
@@ -17,40 +15,44 @@ sub BUILD {
 }
 
 has dsn => (
-	is      => 'rw',
-#	isa     => 'Str',
+	is => 'rw',
+
+	#	isa     => 'Str',
 	default => sub { 'dbi:SQLite:dbname=tmp.sqlite' },
 );
 
 has db_user => (
-	is      => 'rw',
-#	isa     => 'Str',
+	is => 'rw',
+
+	#	isa     => 'Str',
 	default => sub { 'king' },
 );
 
 has db_password => (
-	is      => 'rw',
-#	isa     => 'Str',
+	is => 'rw',
+
+	#	isa     => 'Str',
 	default => sub { 'kong' },
 );
 
 has log_conf => (
 	is      => 'rw',
-	default => sub {'log4perl.conf' },
+	default => sub { 'log4perl.conf' },
 );
 
 has +name => (
-	is      => 'rw',
-#	isa     => 'Str',
+	is => 'rw',
+
+	#	isa     => 'Str',
 	default => sub { 'db' },
 );
 
 sub build_container {
 	my $s = shift;
-	
+
 	my $log_cntnr = App::Services::Logger::Container->new(
 		log_conf => $s->log_conf,
-		name => 'log'
+		name     => 'log'
 	);
 
 	container $s => as {
@@ -62,7 +64,7 @@ sub build_container {
 		service 'db_conn_svc' => (    #-- raw DBI database handle
 			class        => 'App::Services::DB::Conn::Service',
 			dependencies => {
-				logger_svc     => depends_on('log/logger_svc'),
+				logger_svc  => depends_on('log/logger_svc'),
 				dsn         => 'dsn',
 				db_user     => 'db_user',
 				db_password => 'db_password',
@@ -73,14 +75,14 @@ sub build_container {
 			class        => 'App::Services::DB::Exec::Service',
 			dependencies => {
 				logger_svc => depends_on('log/logger_svc'),
-				db_conn => depends_on('db_conn_svc'),
+				db_conn    => depends_on('db_conn_svc'),
 			}
 		);
 
 	};
-	
+
 	$s->add_sub_container($log_cntnr);
-	
+
 	return $s;
 }
 
