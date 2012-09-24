@@ -6,20 +6,26 @@ use Bread::Board;
 use Test::More qw(no_plan);
 
 use App::Services::ObjStore::Container;
-use App::Services::Forker::Container;
 
 use MyObj;
 
-my $os_cntnr = App::Services::ObjStore::Container->new();
-#my $frkr_cntnr = App::Services::Forker::Container->new();
+my $log_conf = qq/ 
+log4perl.rootLogger=INFO, stdout
+log4j.appender.stdout=org.apache.log4j.ConsoleAppender
+log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
+log4j.appender.stdout.layout.ConversionPattern=%-6p| %m%n
+
+/;
+
+my $cntnr = App::Services::ObjStore::Container->new(
+	log_conf => \$log_conf,
+);
 
 #my $lsvc = $cntnr->resolve( service => 'log/logger_svc' );
 #
 #ok( $lsvc, "Create logger service" );
 
-__END__
-
-my $os_svc = $os_cntnr->resolve( service => 'obj_store_svc' );
+my $svc = $cntnr->resolve( service => 'obj_store_svc' );
 
 ok( $svc, "Create object store service" );
 
@@ -70,7 +76,7 @@ my @obj_vals;
 
 foreach my $obj ( $svc->all_objects ) {
 
-	ok( ( ref($obj) eq 'MyObj' ), "$$: Got object ($i)" );
+	ok( ( ref($obj) eq 'MyObj' ), "parent ($$): Got object ($i)" );
 
 	push @obj_vals, $obj->foo;
 	$svc->log->info("$$: Found obj with foo: " . $obj->foo);
