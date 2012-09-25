@@ -47,16 +47,22 @@ has subject => (
 	required => 1,
 );
 
+has debug => (
+	is      => 'rw',
+	isa     => Str,
+	default => sub { 0 },
+);
+
 sub send {
 	my $s = shift or confess;
 	
 	my $smtp = Net::SMTP->new(
 		Host => $s->mailhost,
-		Debug => 1
+		Debug => $s->debug,
 	);
 
 	$smtp->mail( $s->from );
-	$smtp->to(join( ',', @{ $s->recipients } ));
+	$smtp->to( @{ $s->recipients } );
 
 	$smtp->data();
 	$smtp->datasend( "To: " . join( ',', @{ $s->recipients } ) . "\n" );
