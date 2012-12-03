@@ -169,7 +169,7 @@ $s->timeout(0);
 
 	my $forker_rc = 1;
 
-	return @child_pids if $s->no_waitpid;    #-- Maybe you want to do something else while the children are operating
+	return (\@child_labels_by_pid, @child_pids) if $s->no_waitpid;    #-- Maybe you want to do something else while the children are operating
 
 	unless ( $s->no_fork ) {
 		$log->debug("Parent: Waiting for children to exit");
