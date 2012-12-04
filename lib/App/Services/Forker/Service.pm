@@ -52,6 +52,11 @@ has chunks => (
 	default => 0,
 );
 
+has before_waitpid => (
+	is  => 'rw',
+	isa => 'CodeRef',
+);
+
 sub forker {
 	my $s = shift;
 
@@ -61,8 +66,9 @@ sub forker {
 	my $ra = $s->child_objects;    #-- reference to an array
 	my $rs = $s->child_actions;    #-- reference to a sub
 
-$s->timeout(0);
-#$s->no_fork(1);
+	$s->timeout(0);
+
+	$s->no_fork(0);
 
 	$log->logconfess("Max procs too high!")
 	  if scalar( @{$ra} ) > $s->max_procs;
@@ -87,7 +93,7 @@ $s->timeout(0);
 				eval {
 					local $SIG{ALRM} = sub { die "Process timed out"; };
 					alarm $s->timeout;
-					$result = &{$rs}($obj);
+					$result = $rs->($obj);
 					alarm 0;
 				};
 
@@ -99,10 +105,10 @@ $s->timeout(0);
 					$log->error("Pseudo ${child_name}: $@");
 					exit 1;
 				}
-				
+
 			} else {
-				$result = &{$rs}($obj);
-				
+				$result = $rs->($obj);
+
 			}
 
 			$log->debug("Pseudo-child ${child_name}: Exiting");
@@ -115,7 +121,7 @@ $s->timeout(0);
 
 			if ( $pid == 0 ) {
 
-				$child_name .= " ($$)";
+				$child_name .= " ($$)";    #-- add process id to child label
 
 				#-- I'm a child
 				$log->debug("Child $child_name: Spawned");
@@ -126,7 +132,7 @@ $s->timeout(0);
 					eval {
 						local $SIG{ALRM} = sub { die "Process timed out"; };
 						alarm $s->timeout;
-						$result = &{$rs}($obj);
+						$result = $rs->($obj);
 						alarm 0;
 					};
 
@@ -140,12 +146,12 @@ $s->timeout(0);
 						exit 1;
 
 					}
-					
+
 				} else {
-					$result = &{$rs}($obj);
-					
+					$result = $rs->($obj);
+
 				}
-				
+
 				my $rc = defined $result ? 0 : 1;                                                     #-- perl convention (undef = error) => shell convention (>0 = error)
 
 				$result = '' unless defined $result;                                                  #-- turn undef into a string
@@ -158,6 +164,8 @@ $s->timeout(0);
 				#-- I'm the parent, keep track of my children
 				push @child_pids, $pid;
 				$child_labels_by_pid[$pid] = $child_name;
+				
+				$s->log->debug("Forked child: $child_name");
 
 				$child_number++;
 
@@ -167,9 +175,14 @@ $s->timeout(0);
 
 	}
 
-	my $forker_rc = 1;
+	if ( $s->before_waitpid ) {
+		my $result = $s->before_waitpid->( $ra );
 
-	return (\@child_labels_by_pid, @child_pids) if $s->no_waitpid;    #-- Maybe you want to do something else while the children are operating
+		return unless $result;
+
+	}
+
+	my $forker_rc = 1;
 
 	unless ( $s->no_fork ) {
 		$log->debug("Parent: Waiting for children to exit");
@@ -186,7 +199,7 @@ $s->timeout(0);
 			} else {
 				my $rc = $? >> 8;
 				if ($rc) {
-					undef($forker_rc) if $rc;    #-- if exit is non-zero, return undef
+					undef($forker_rc) if $rc;    #-- if any exit is non-zero, return undef for the whole fork op
 					$s->log->error("Child $child_name: completed with error value $rc");
 
 				} else {
@@ -201,7 +214,14 @@ $s->timeout(0);
 		$log->debug("Parent: Finished waiting. All children exited");
 	}
 
-	$log->info("End Forker");
+	if ( $forker_rc ) {
+		$s->log->info( "End Forker: Success" );
+	
+	} else {
+		$s->log->info( "End Forker: Failed" );
+
+	}
+	
 
 	return $forker_rc;
 }
@@ -212,7 +232,7 @@ no Moose;
 
 =head1 NAME
 
-Project::Util::Forker
+App::Services::Forker::Service
 
 =head1 SYNOPSIS
 
