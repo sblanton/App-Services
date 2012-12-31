@@ -55,4 +55,7 @@ my $svc = $cntnr->resolve( service => 'email_svc' );
 
 ok( $svc, "Create email service" );
 
-ok( $svc->send, "Sent mail" );
+SKIP: {
+	skip 1 unless 0;
+	ok( $svc->send, "Sent mail" );
+}

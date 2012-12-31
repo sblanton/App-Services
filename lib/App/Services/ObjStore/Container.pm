@@ -29,8 +29,16 @@ log4perl.appender.main.layout   = Log::Log4perl::Layout::SimpleLayout
 
 has obj_store_file => (
 	is      => 'rw',
-	default => "/tmp/.app-services-obj-store-$$.db",
+	default => sub {
+		my $tmp = $ENV{TMP} || '/tmp';
+		return "${tmp}/.app-services-obj-store-$$.db";
+	}
+);
 
+has dsn => (
+	is      => 'rw',
+	default => sub { "dbi:SQLite:dbname=" . $_[0]->obj_store_file },
+	lazy    => 1,
 );
 
 has +name => (
@@ -51,12 +59,14 @@ sub build_container {
 	container $s => as {
 
 		service 'obj_store_file' => $s->obj_store_file;
+		service 'kdb_dsn'        => $s->dsn;
 
 		service 'obj_store_svc' => (
 			class        => 'App::Services::ObjStore::Service',
 			dependencies => {
 				logger_svc     => depends_on('log/logger_svc'),
 				obj_store_file => 'obj_store_file',
+				kbs_dsb        => 'kdb_dsn',
 			}
 		);
 

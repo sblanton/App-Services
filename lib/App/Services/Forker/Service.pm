@@ -159,7 +159,7 @@ sub forker {
 				$log->debug("Child $child_name: Exiting with result=<$result>,rc=<$rc>");
 				exit $rc;                                                                             #-- Critical! Don't forget!
 
-			} else {
+			} elsif ( $pid >= 0 ) {
 
 				#-- I'm the parent, keep track of my children
 				push @child_pids, $pid;
@@ -168,6 +168,9 @@ sub forker {
 				$s->log->debug("Forked child: $child_name");
 
 				$child_number++;
+
+			} else {
+				$s->log->error("$child_name: fork returned invalid pid=$pid");
 
 			}
 

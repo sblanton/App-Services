@@ -1,13 +1,21 @@
 #!/usr/bin/perl
 
-use common::sense;
+package MyObj {
+
+	use Moose;
+
+	  has foo => ( is => 'rw' );
+	  has bar => ( is => 'rw' );
+
+	  no Moose;
+
+};
+
 
 use Bread::Board;
 use Test::More qw(no_plan);
 
 use App::Services::ObjStore::Container;
-
-use MyObj;
 
 my $cntnr = App::Services::ObjStore::Container->new();
 

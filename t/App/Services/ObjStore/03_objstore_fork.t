@@ -1,13 +1,20 @@
 #!/usr/bin/perl
 
-use common::sense;
+package MyObj {
+
+	use Moose;
+
+	  has foo => ( is => 'rw' );
+	  has bar => ( is => 'rw' );
+
+	  no Moose;
+
+};
 
 use Bread::Board;
 use Test::More qw(no_plan);
 
 use App::Services::ObjStore::Container;
-
-use MyObj;
 
 my $log_conf = qq/ 
 log4perl.rootLogger=INFO, stdout
@@ -17,13 +24,7 @@ log4j.appender.stdout.layout.ConversionPattern=%-6p| %m%n
 
 /;
 
-my $cntnr = App::Services::ObjStore::Container->new(
-	log_conf => \$log_conf,
-);
-
-#my $lsvc = $cntnr->resolve( service => 'log/logger_svc' );
-#
-#ok( $lsvc, "Create logger service" );
+my $cntnr = App::Services::ObjStore::Container->new( log_conf => \$log_conf, );
 
 my $svc = $cntnr->resolve( service => 'obj_store_svc' );
 
@@ -50,11 +51,12 @@ foreach my $i ( 1 .. 10 ) {
 
 		my $oid = $svc->add_object($obj);
 
-		ok( $oid, "Child $i ($$): inserted obj" );
+		print "Child $i ($$): inserted obj\n";
 
 		exit 0;
-		
-	} else {
+
+	}
+	else {
 		push @child_pids, $pid;
 	}
 
@@ -79,7 +81,7 @@ foreach my $obj ( $svc->all_objects ) {
 	ok( ( ref($obj) eq 'MyObj' ), "parent ($$): Got object ($i)" );
 
 	push @obj_vals, $obj->foo;
-	$svc->log->info("$$: Found obj with foo: " . $obj->foo);
+	$svc->log->info( "$$: Found obj with foo: " . $obj->foo );
 
 	$i++;
 }
