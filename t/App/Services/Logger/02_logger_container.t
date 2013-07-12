@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 use common::sense;
 use Bread::Board;
@@ -25,3 +25,4 @@ my $log = $svc->log;
 ok($log, "Got Log4perl logger");
 
 ok($log->info("Log success!!"), "Logged something");
+
