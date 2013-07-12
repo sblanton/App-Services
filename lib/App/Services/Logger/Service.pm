@@ -6,6 +6,9 @@ use common::sense;
 
 use Log::Log4perl;
 
+#-- If log_conf is a reference, Log::Log4perl interprets the reference as a string containing conf info
+#-- if it contains a scalar, Log::Log4perl interprets the scalar as a file name
+
 has log_conf => (
 	is => 'rw',
 
