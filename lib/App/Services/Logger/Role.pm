@@ -7,7 +7,6 @@ use Carp qw(confess);
 
 has logger_svc => (
 	is       => 'rw',
-	isa      => 'App::Services::Logger::Service',
 	handles  => [qw(log log_category log_conf)],
 	required => 1,
 

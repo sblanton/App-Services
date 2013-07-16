@@ -12,23 +12,6 @@ has cmd => (
 	#required => 1,
 );
 
-#-- convenience data:
-has host_ip => (
-	is      => 'rw',
-	isa     => 'Maybe[Str]',
-	default => sub { $_[0]->ssh_svc->host_ip if $_[0]->ssh_svc->host_ip },
-	lazy    => 1,
-
-);
-
-has host_name => (
-	is      => 'rw',
-	isa     => 'Str',
-	default => sub { $_[0]->ssh_svc->host_name if $_[0]->ssh_svc->host_name },
-	lazy    => 1,
-
-);
-
 sub exec {
 	my $s   = shift or confess;
 	my $cmd = shift or $s->cmd;

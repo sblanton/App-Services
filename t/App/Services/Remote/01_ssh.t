@@ -20,7 +20,6 @@ my $cntnr = App::Services::Remote::Container->new(
 
 my $svc = $cntnr->resolve( service => 'ssh_conn_svc' );
 
-exit 0;
 my $xsvc = $cntnr->resolve( service => 'ssh_exec_svc' );
 
 ok($svc, "Create rm_exec service");

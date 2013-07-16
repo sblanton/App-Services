@@ -3,6 +3,8 @@ package App::Services::Remote::Container;
 use Moose;
 use Bread::Board;
 
+use App::Services::Logger::Container;
+
 extends 'Bread::Board::Container';
 
 sub BUILD {
@@ -11,20 +13,19 @@ sub BUILD {
 
 has user => (
 	is => 'rw',
-
-	#	isa     => 'Str',
+	isa     => 'Str',
 	default => sub { 'please supply a user' },
 );
 
 has password => (
 	is      => 'rw',
-	default => sub { '' },
+	isa     => 'Str',
+	default => sub { 'nopassword' },
 );
 
 has host_name => (
 	is => 'rw',
-
-	#	isa     => 'Str',
+	isa     => 'Str',
 	default => sub { 'please supply a host_name' },
 );
 
@@ -36,7 +37,7 @@ has log_conf => (
 has +name => (
 	is      => 'rw',
 	isa     => 'Str',
-	default => 'ssh_svc',
+	default => 'ssh_cntnr',
 );
 
 sub build_container {
@@ -47,28 +48,28 @@ sub build_container {
 		name     => 'log'
 	);
 
-	service 'host_name' => $s->host_name;
-	service 'user'      => $s->user;
-	service 'password'  => $s->password;
-
 	container $s => as {
 
-		service 'ssh_conn' => (
+		service 'rem_password'  => $s->password;
+		service 'host_name' => $s->host_name;
+		service 'rem_user'      => $s->user;
+
+		service 'ssh_conn_svc' => (
 			class        => 'App::Services::Remote::Conn::Service',
 			dependencies => {
-				log_svc   => depends_on('log_svc'),
+				logger_svc   => depends_on('log/logger_svc'),
 				host_name => 'host_name',
-				user      => 'user',
-				password  => 'password',
+				rem_user      => 'rem_user',
+				rem_password  => 'rem_password',
 
 			}
 		);
 
-		service 'ssh_exec' => (
+		service 'ssh_exec_svc' => (
 			class        => 'App::Services::Remote::Exec::Service',
 			dependencies => {
-				log_svc  => depends_on('log_svc'),
-				ssh_conn => depends_on('ssh_conn'),
+				logger_svc  => depends_on('log/logger_svc'),
+				ssh_conn_svc => depends_on('ssh_conn_svc'),
 			}
 		);
 
